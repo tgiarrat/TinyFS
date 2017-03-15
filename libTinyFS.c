@@ -1,3 +1,5 @@
+//page 548
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,37 +13,17 @@ enum blockType {
    FREE = 4
 };
 
-static void init_superblock(int disk){
-   char *data = calloc(BLOCKSIZE, sizeof(char)); //allocate and clear memory
-   data[0] = SUPERBLOCK; //set blocktype
-   data[1] = MAGIC_NUM; //set magic number (second byte)
-   data[2]
-   /*
-    
-    buffer[2] = ((openDisks[disk].headFree)>>8) & 0xFF;
-    buffer[3] = openDisks[disk].headFree & 0xFF; // First free block on disk
-    buffer[4] = ((openDisks[disk].numBlocks)>>8) & 0xFF;
-    buffer[5] = openDisks[disk].numBlocks & 0xFF; // Number of blocks on disk
-    buffer[6] = ((openDisks[disk].freeBlocks)>>8) & 0xFF;
-    buffer[7] = (openDisks[disk].freeBlocks) & 0xFF; // Number of free blocks on disk
-    buffer[8] = ((openDisks[disk].inodeBlocks)>>8) & 0xFF;
-    buffer[9] = openDisks[disk].inodeBlocks & 0xFF; // Number of inodes on disk
-    
-    
-    memcpy(openDisks[disk].superblock, buffer, BLOCKSIZE);
-    
-    writeBlock(disk, 0, buffer); // Write superblock, always at block 0
-    free(buffer);
-    
-    
-    */
+static void init_superblock(SuperBlock *sBlk, int blkCount){
+   
+   sBlk->type = SUPERBLOCK;
+   sBlk->magicNum = MAGIC_NUM;
+   sBlk->root_inode = 1;//0th block is the superblock
+   sBlk->next_free = 2;
+   sBlk->last_free = blkCount - 1;
+   
+   memset(sBlk->data, 0, BLOCKSIZE-5);//clears the rest of the data of the block
 }
 
-int init_disk(int diskNum, int numBlocks) {
-   
-   //initialize and write superblock:
-   init_superblock();
-}
 
 
 
@@ -53,13 +35,22 @@ int tfs_mkfs(char *filename, int nBytes){
    if (diskNum < 0) { // error
       //to do: handle open disk error
    }
-   else { //format the file to be a mountable disk
+   
+   //format the file to be a mountable disk
       
-      int blockCount = nBytes / BLOCKSIZE; //number of blocks to make
-      
-      init_disk();//initialize all data to 0x00
+   int blockCount = nBytes / BLOCKSIZE; //number of blocks to make
+   
+   SuperBlock *sBlk;
+   init_superblock(sBlk, blockCount); //initializes the superblock
+   
+   //initialize free blocks:
+   FreeBlock fBlk;
+   int i;
+   
+   for (i = 2; i < ) {
       
    }
+   
    
 }
 

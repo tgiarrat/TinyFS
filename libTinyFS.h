@@ -1,4 +1,5 @@
-
+#ifndef LIBTINYFS_H
+#define LIBTINYFS_H
 
 /* The default size of the disk and file system block */
 #define BLOCKSIZE 256
@@ -8,6 +9,22 @@
 /* use this name for a default disk file name */
 #define DEFAULT_DISK_NAME “tinyFSDisk”
 typedef int fileDescriptor;
+
+typedef struct SuperBlock{
+   uint8_t type;
+   uint8_t magicNum;
+   uint8_t root_inode;
+   uint8_t next_free;
+   uint8_t last_free;
+   char data[BLOCKSIZE - 5];
+}SuperBlock;
+
+typedef struct FreeBlock {
+   uint8_t type;
+   uint8_t magic_num;
+   uint8_t next_free;
+   char data[BLOCKSIZE - 3];
+} FreeBlock;
 
 /* Makes a blank TinyFS file system of size nBytes on the unix file specified by ‘filename’. This function should use the emulated disk library to open the specified unix file, and upon success, format the file to be mountable disk. This includes initializing all data to 0x00, setting magic numbers, initializing and writing the superblock and inodes, etc. Must return a specified success/error code. */
 int tfs_mkfs(char *filename, int nBytes);
@@ -34,3 +51,5 @@ int tfs_readByte(fileDescriptor FD, char *buffer);
 /* change the file pointer location to offset (absolute). Returns success/error codes.*/
 int tfs_seek(fileDescriptor FD, int offset);
 
+
+#endif
