@@ -6,88 +6,97 @@
 #include "libTinyFS.h"
 #include "libDisk.h"
 
-enum blockType {
-   SUPERBLOCK = 1,
-   INODE = 2,
-   FILE_EXTENT = 3,
-   FREE = 4
+enum blockType
+{
+    SUPERBLOCK = 1,
+    INODE = 2,
+    FILE_EXTENT = 3,
+    FREE = 4
 };
 
-static void init_superblock(SuperBlock *sBlk, int blkCount){
-   
-   sBlk->type = SUPERBLOCK;
-   sBlk->magicNum = MAGIC_NUM;
-   sBlk->root_inode = 1;//0th block is the superblock
-   sBlk->next_free = 2;
-   sBlk->last_free = blkCount - 1;
-   
-   memset(sBlk->data, 0, BLOCKSIZE-5);//clears the rest of the data of the block
+static void init_superblock(SuperBlock *sBlk, int blkCount, int diskNum)
+{
+
+    sBlk->type = SUPERBLOCK;
+    sBlk->magicNum = MAGIC_NUM;
+    sBlk->root_inode = 1; //0th block is the superblock
+    sBlk->next_free = 2;
+    sBlk->last_free = blkCount - 1;
+
+    memset(sBlk->data, 0, BLOCKSIZE - 5); //clears the rest of the data of the block
+
+    if (writeBlock(diskNum, 0, sBlk) < 0)
+    {
+        return WRITE_ERROR;
+    }
+
+    FreeBlock fBlk;
+    fBlk.type = FREE;
+    fBlk.magic_num = MAGIC_NUM;
+	int i;
+
+	for (i = 2; i < blkCount; i++) {
+        if (i == blkCount - 1){
+            fBlk.next_free = 0;
+        }
+        else{
+            fBlk.next_free = i + 1;
+        }
+    	memset(fBlk.data, 0, BLOCKSIZE-3);
+
+    	if (writeBlock(diskNum, i, &fBlk) < 0) {
+    		return WRITE_ERROR;
+    	}
 }
 
+int tfs_mkfs(char *filename, int nBytes)
+{
+    //todo: error check for num bytes
 
+    int diskNum = openDisk(filename, nBytes);
+    if (diskNum < 0)
+    {   // error
+        //to do: handle open disk error
+    }
 
+    //format the file to be a mountable disk
 
-int tfs_mkfs(char *filename, int nBytes){
-   
-   //todo: error check for num bytes
-   
-   int diskNum = openDisk(filename, nBytes);
-   if (diskNum < 0) { // error
-      //to do: handle open disk error
-   }
-   
-   //format the file to be a mountable disk
-      
-   int blockCount = nBytes / BLOCKSIZE; //number of blocks to make
-   
-   SuperBlock *sBlk;
-   init_superblock(sBlk, blockCount); //initializes the superblock
-   
-   //initialize free blocks:
-   FreeBlock fBlk;
-   int i;
-   
-   for (i = 2; i < ) {
-      
-   }
-   
-   
+    int blockCount = nBytes / BLOCKSIZE; //number of blocks to make
+
+    SuperBlock *sBlk;
+    init_superblock(sBlk, blockCount, diskNum); //initializes the superblock
+    return 0;
 }
 
-int tfs_mount(char *diskname){
-   
+int tfs_mount(char *diskname)
+{
+    return 0;
 }
-
-int tfs_unmount(void){
-   
+int tfs_unmount(void)
+{
+    return 0;
 }
-
-fileDescriptor tfs_openFile(char *name) {
-   
-   
+fileDescriptor tfs_openFile(char *name)
+{
+    return 0;
 }
-
-int tfs_closeFile(fileDescriptor FD){
-   
+int tfs_closeFile(fileDescriptor FD)
+{
+    return 0; 
 }
-
-int tfs_writeFile(fileDescriptor FD,char *buffer, int size){
-   
+int tfs_writeFile(fileDescriptor FD, char *buffer, int size)
+{
+    return 0;
 }
-
-int tfs_deleteFile(fileDescriptor FD){
-   
+int tfs_deleteFile(fileDescriptor FD)
+{
+    return 0;
 }
-
-
-int tfs_readByte(fileDescriptor FD, char *buffer){
-   
+int tfs_readByte(fileDescriptor FD, char *buffer)
+{
+    return 0;
 }
-
-int tfs_seek(fileDescriptor FD, int offset){
-   
+int tfs_seek(fileDescriptor FD, int offset)
+{
+    return 0;
 }
-
-
-
-
