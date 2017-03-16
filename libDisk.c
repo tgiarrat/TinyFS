@@ -1,6 +1,6 @@
 
 
-
+#include "libdisk.h"
 
 int readBlock(int disk, int bNum, void *plaintext) {
    disk_ctx *ctx;

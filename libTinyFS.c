@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "libTinyFS.h"
-#include "libDisk.h"
+#include "libdisk.h"
 
 enum blockType
 {
@@ -13,6 +13,10 @@ enum blockType
     FILE_EXTENT = 3,
     FREE = 4
 };
+
+static int system_mounted = 0;
+static int block_count = 0;
+static int mounted_disk;
 
 static int init_superblock(int blkCount, int diskNum)
 {
@@ -65,14 +69,45 @@ int tfs_mkfs(char *filename, int nBytes)
 
     //format the file to be a mountable disk
 
-    int blockCount = nBytes / BLOCKSIZE; //number of blocks to make
+    block_count = nBytes / BLOCKSIZE; //number of blocks to make
 
-    init_superblock( blockCount, diskNum); //initializes the superblock
+    init_superblock( block_count, diskNum); //initializes the superblock
     return 0;
 }
 
 int tfs_mount(char *diskname)
 {
+    char buf[BLOCKSIZE];
+    int i = 0;
+
+    if (system_mounted){
+        //to do: proper error shit
+        return -2; 
+    }
+
+    if (diskname == NULL) {
+        return -2;
+        //to do: proper error checking
+    }
+
+    mounted_disk = openDisk(diskname, 0); //0 means existing disk opens
+
+    if (mounted_disk == -1) {
+        //to do : error
+        return -2;
+    }
+
+    system_mounted = 1;
+
+    for(;i < block_count; i++) {
+        readBlock(mounted_disk, i, buf);
+        if(buf[1] != MAGIC_NUM) {
+            //to do: error 
+            return -2;          
+        }
+    }
+
+
     return 0;
 }
 int tfs_unmount(void)
