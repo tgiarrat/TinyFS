@@ -8,6 +8,10 @@
 #define DEFAULT_DISK_SIZE 10240
 /* use this name for a default disk file name */
 #define DEFAULT_DISK_NAME “tinyFSDisk”
+
+
+#include <stdint.h>
+
 typedef int fileDescriptor;
 
 typedef struct SuperBlock{

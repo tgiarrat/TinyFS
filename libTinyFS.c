@@ -14,20 +14,21 @@ enum blockType
     FREE = 4
 };
 
-static void init_superblock(SuperBlock *sBlk, int blkCount, int diskNum)
+static int init_superblock(int blkCount, int diskNum)
 {
+    SuperBlock sBlk;
+    sBlk.type = SUPERBLOCK;
+    sBlk.magicNum = MAGIC_NUM;
+    sBlk.root_inode = 1; //0th block is the superblock
+    sBlk.next_free = 2;
+    sBlk.last_free = blkCount - 1;
 
-    sBlk->type = SUPERBLOCK;
-    sBlk->magicNum = MAGIC_NUM;
-    sBlk->root_inode = 1; //0th block is the superblock
-    sBlk->next_free = 2;
-    sBlk->last_free = blkCount - 1;
+    memset(sBlk.data, 0, BLOCKSIZE - 5); //clears the rest of the data of the block
 
-    memset(sBlk->data, 0, BLOCKSIZE - 5); //clears the rest of the data of the block
-
-    if (writeBlock(diskNum, 0, sBlk) < 0)
+    if (writeBlock(diskNum, 0, &sBlk) < 0)
     {
-        return WRITE_ERROR;
+        //to do: error
+        return -1;
     }
 
     FreeBlock fBlk;
@@ -45,8 +46,11 @@ static void init_superblock(SuperBlock *sBlk, int blkCount, int diskNum)
     	memset(fBlk.data, 0, BLOCKSIZE-3);
 
     	if (writeBlock(diskNum, i, &fBlk) < 0) {
-    		return WRITE_ERROR;
+    		//to do: error
+            return -1;
     	}
+    }
+    return 0;
 }
 
 int tfs_mkfs(char *filename, int nBytes)
@@ -63,8 +67,7 @@ int tfs_mkfs(char *filename, int nBytes)
 
     int blockCount = nBytes / BLOCKSIZE; //number of blocks to make
 
-    SuperBlock *sBlk;
-    init_superblock(sBlk, blockCount, diskNum); //initializes the superblock
+    init_superblock( blockCount, diskNum); //initializes the superblock
     return 0;
 }
 
