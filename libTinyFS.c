@@ -77,7 +77,7 @@ int tfs_mkfs(char *filename, int nBytes)
 
 int tfs_mount(char *diskname)
 {
-    char buf[BLOCKSIZE];
+    char block[BLOCKSIZE];
     int i = 0;
 
     if (system_mounted){
@@ -100,8 +100,8 @@ int tfs_mount(char *diskname)
     system_mounted = 1;
 
     for(;i < block_count; i++) {
-        readBlock(mounted_disk, i, buf);
-        if(buf[1] != MAGIC_NUM) {
+        readBlock(mounted_disk, i, block);
+        if(block[1] != MAGIC_NUM) { //not of tinyfs type
             //to do: error 
             return -2;          
         }
@@ -112,6 +112,9 @@ int tfs_mount(char *diskname)
 }
 int tfs_unmount(void)
 {
+   
+   
+   system_mounted = 0;
     return 0;
 }
 fileDescriptor tfs_openFile(char *name)
