@@ -1,4 +1,4 @@
-#include "libdisk.h"
+#include "libDisk.h"
 
 int print_hex(char *pre, unsigned char *bytes, int size) {
     printf("%s", pre);
@@ -6,6 +6,7 @@ int print_hex(char *pre, unsigned char *bytes, int size) {
         printf("%02x", bytes[i]);
     }
     printf("\n");
+    return 0;
 }
 
 // Generates a master key file
@@ -106,11 +107,12 @@ void generateRandomData(unsigned char *data, int length) {
 
 // decrypts master key with PBKDF(oldPassword, salt)
 // encrypts master key with PBKDF(newPassword, salt)
-int changePassword(char *oldFile, char *newFile, unsigned char *oldPassword, unsigned char *newPassword) {
+int changePassword(char *oldFile, char *newFile, char *oldPassword, char *newPassword) {
     unsigned char key[AES_KEY_SIZE];
     unsigned char iv[AES_IV_SIZE];
     extractMasterKey(oldFile, oldPassword, key, iv);
     generateMasterKey(newFile, newPassword, key, iv);
+    return SUCCESS;
 }
 
 int mountDisk(char *filename, int nBytes, char *password, char *masterKeyFile) {
@@ -153,7 +155,6 @@ int mountDisk(char *filename, int nBytes, char *password, char *masterKeyFile) {
 
         int writeStatus;
         for (int block = 0; block < blocks; block++) {
-            printf("writing block %d\n", block);
             if ((writeStatus = writeBlock(mount_idx, block, zero_block))) {
                 printf("ERROR writing blocks, status: %d\n", writeStatus);
             }
@@ -235,7 +236,6 @@ statusCode aesCtrXorBlock(unsigned char *inputBytes, unsigned char *outputBytes,
     ivXord[3] ^= (bNum & 0x000000FF);
 
     if (aes128Ctr(key, ivXord, inputBytes, outputBytes, BLOCK_SIZE)) {
-        printf("ERROR\n");
         return ENCRYPTION_ERROR;
     }
 
