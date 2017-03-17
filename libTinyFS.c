@@ -18,6 +18,8 @@ static int system_mounted = 0;
 static int block_count = 0;
 static int mounted_disk;
 
+static FileTable open_file_table;
+
 static int init_superblock(int blkCount, int diskNum)
 {
     SuperBlock sBlk;
@@ -107,14 +109,37 @@ int tfs_mount(char *diskname)
         }
     }
 
+    //init file table?
+
+    open_file_table->head = NULL;
+    open_file_table->tail = NULL;
+    open_file_table->numOpenFiles = 0;
+    open_file_table->lastFile = 0;
+    //open_file_table->maxFiles = ;
+
 
     return 0;
 }
 int tfs_unmount(void)
-{
-   
-   
-   system_mounted = 0;
+
+    if (system_mounted == 0) {
+        return -1; 
+        //to do error
+    }
+
+    mounted_disk = -1; //to do: check later
+    system_mounted = 0;
+
+
+    //clean up open file table
+    FileTableNode *curNode = open_file_table->head;
+    FileTableNode *temp;
+	while (curNode) {
+		temp = curNode;
+		curNode = curNode->next;
+		free(temp);
+	}
+	free(curNode);
     return 0;
 }
 fileDescriptor tfs_openFile(char *name)
