@@ -115,7 +115,7 @@ int changePassword(char *oldFile, char *newFile, char *oldPassword, char *newPas
     return SUCCESS;
 }
 
-int mountDisk(char *filename, int nBytes, char *password, char *masterKeyFile) {
+int openDisk(char *filename, int nBytes, char *password, char *masterKeyFile) {
     int mount_idx;
     for (mount_idx = 0; disks[mount_idx] != NULL && mount_idx != MAX_DISKS; ++mount_idx);
 
@@ -170,7 +170,7 @@ int mountDisk(char *filename, int nBytes, char *password, char *masterKeyFile) {
     return mount_idx;
 }
 
-int unmountDisk(int disk) {
+int closeDisk(int disk) {
     disk_ctx *ctx;
     if (!(ctx = disks[disk])) {
         return DISK_NOT_FOUND;

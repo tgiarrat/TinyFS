@@ -10,7 +10,7 @@ LDFLAGS=$(pkg-config --libs libsodium)
 ############
 # LIB DISK #
 ############
-make DiskMain: libDisk.o libDisk.h
+DiskMain: libDisk.o libDisk.h
 	gcc $(FLAGS) $(CFLAGS) $(LDFLAGS) DiskMain.c *.o libDisk.h $(LIBFLAGS) -o DiskMain
 
 libDisk.o: libDisk.c libDisk.h
@@ -19,20 +19,26 @@ libDisk.o: libDisk.c libDisk.h
 
 libDisk.c: libDisk.h
 	touch DiskMain.c
-
-libDisk.c: libDisk.h
 	touch libDisk.c
 
 ###############
 # LIB TINY FS #
 ###############
+TinyFSMain: libTinyFS.o libTinyFS.h
+	gcc $(FLAGS) $(CFLAGS) $(LDFLAGS) TinyFSMain.c *.o libDisk.h libTinyFS.h $(LIBFLAGS) -o TinyFSMain
+
 libTinyFS.o: libTinyFS.c libTinyFS.h
 	gcc $(FLAGS) -c libTinyFS.c libTinyFS.h
 	gcc -S $<
 
-$(LIB): libDisk.o libTinyFS.o 
-	ar r $@ libDisk.o libTinyFS.o 
-	ranlib $@	
+libTinyFS.c: libTinyFS.h
+	touch TinyFSMain.c
+	touch libTinyFS.c
+
+
+# $(LIB): libDisk.o libTinyFS.o 
+# 	ar r $@ libDisk.o libTinyFS.o 
+# 	ranlib $@	
 
 ###########
 # GENERAL #

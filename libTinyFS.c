@@ -4,10 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "libTinyFS.h"
-#include "libdisk.h"
+#include "libDisk.h"
 
-enum blockType
-{
+enum blockType {
     SUPERBLOCK = 1,
     INODE = 2,
     FILE_EXTENT = 3,
@@ -20,8 +19,7 @@ static int mounted_disk;
 
 static FileTable open_file_table;
 
-static int init_superblock(int blkCount, int diskNum)
-{
+static int init_superblock(int blkCount, int diskNum) {
     SuperBlock sBlk;
     sBlk.type = SUPERBLOCK;
     sBlk.magicNum = MAGIC_NUM;
@@ -59,11 +57,10 @@ static int init_superblock(int blkCount, int diskNum)
     return 0;
 }
 
-int tfs_mkfs(char *filename, int nBytes)
-{
+int tfs_mkfs(char *filename, int nBytes, char *password, char *masterKeyFile) {
     //todo: error check for num bytes
 
-    int diskNum = openDisk(filename, nBytes);
+    int diskNum = openDisk(filename, nBytes, password, masterKeyFile);
     if (diskNum < 0)
     {   // error
         //to do: handle open disk error
@@ -77,8 +74,7 @@ int tfs_mkfs(char *filename, int nBytes)
     return 0;
 }
 
-int tfs_mount(char *diskname)
-{
+int tfs_mount(char *diskname, char *password, char *masterKeyFile) {
     char block[BLOCKSIZE];
     int i = 0;
 
@@ -92,7 +88,7 @@ int tfs_mount(char *diskname)
         //to do: proper error checking
     }
 
-    mounted_disk = openDisk(diskname, 0); //0 means existing disk opens
+    mounted_disk = openDisk(diskname, 0, password, masterKeyFile); //0 means existing disk opens
 
     if (mounted_disk == -1) {
         //to do : error
@@ -142,27 +138,21 @@ int tfs_unmount(void)
 	free(curNode);
     return 0;
 }
-fileDescriptor tfs_openFile(char *name)
-{
+fileDescriptor tfs_openFile(char *name) {
     return 0;
 }
-int tfs_closeFile(fileDescriptor FD)
-{
+int tfs_closeFile(fileDescriptor FD) {
     return 0; 
 }
-int tfs_writeFile(fileDescriptor FD, char *buffer, int size)
-{
+int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
     return 0;
 }
-int tfs_deleteFile(fileDescriptor FD)
-{
+int tfs_deleteFile(fileDescriptor FD) {
     return 0;
 }
-int tfs_readByte(fileDescriptor FD, char *buffer)
-{
+int tfs_readByte(fileDescriptor FD, char *buffer) {
     return 0;
 }
-int tfs_seek(fileDescriptor FD, int offset)
-{
+int tfs_seek(fileDescriptor FD, int offset) {
     return 0;
 }
