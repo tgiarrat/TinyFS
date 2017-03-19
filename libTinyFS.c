@@ -185,6 +185,7 @@ fileDescriptor tfs_openFile(char *name) {
         }
         if (!inode.next_inode) return ERROR_DISK_FULL; //TODO: file not found
         idx = inode.next_inode;
+
         readBlock(mounted_disk, idx, &inode);
     }
     
@@ -225,6 +226,41 @@ int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
 }
 int tfs_deleteFile(fileDescriptor FD) {
     SuperBlock sb;
+    readBlock(mounted_disk, 0, &sb);
+    Inode inode;
+    uint8_t idx = sb.root_inode;
+    readBlock(mounted_disk, sb.root_inode, &inode);
+    FileTableNode *delFT = getNode(FD);
+    Inode del;
+    readBlock(mounted_disk, delFT->bNum, &del);
+    //find prev inode and link it to the next one
+    if (sb.root_inode == delFT->bNum) {
+        sb.root_inode = del.next_inode;
+    }
+    else {
+        while (inode.type == INODE && inode.next_inode != delFT->bNum) {
+            readBlock(mounted_disk, inode.next_inode, &inode);
+        }
+        if (inode.type==INODE) inode.next_inode = del.next_inode;
+        else return ERROR_BAD_FD;
+    }
+        
+    
+    //mark inode as free and add to sb free chain
+    del.type = FREE;
+    writeBlock(mounted_disk, delFT->bNum, &del);
+    
+    //mark all extents as free and add to sb free chain
+    Extent ext;
+    while (del.data_extent) {
+        readBlock(mounted_disk, del.data_extent, &ext);
+        ext.type = FREE;
+        writeBlock(mounted_disk, del.data_extent, &ext);
+        del.data_extent = ext.next_extent;
+    }
+    
+    tfs_closeFile(fd);
+    writeBlock(mounted_disk, 0, &sb);
     return 0;
 }
 int tfs_readByte(fileDescriptor FD, char *buffer) {
@@ -250,6 +286,6 @@ int tfs_seek(fileDescriptor FD, int offset) {
         //to do: error
     }
 
-    file_node->ptr = offset
+    file_node->ptr = offset;
     return 1;
 }
