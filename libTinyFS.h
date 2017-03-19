@@ -49,9 +49,11 @@ typedef struct FreeBlock {
 
 struct FileTableNode {
 	FileTableNode *next;
-	int fd;
+	fileDescriptor fd;
 	int numBytes;
 	int ptr;
+   uint8_t inode_blk;
+   char name[9];
 };
 
 typedef struct FileTable {

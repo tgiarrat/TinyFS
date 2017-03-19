@@ -139,6 +139,38 @@ int tfs_unmount(void)
     return 0;
 }
 fileDescriptor tfs_openFile(char *name) {
+    SuperBlock sb;
+    FileTableNode *node;
+    //check if already open
+    node = open_file_table.head;
+    while (node) {
+        if (!strcmp(name, node->name)) return node.fd;
+        node = node->next;
+    }
+    
+    //not already open so create a new FileTableNode
+    node = malloc(sizeof(FileTableNode));
+    if (!open_file_table.head) open_file_table.head = node;
+    if (open_file_table.tail) open_file_table.tail->next = node;
+    open_file_table.tail = node;
+    
+    //check if file exisits
+    readBlock(mounted_disk, 0, &sb);
+    Inode inode;
+    uint8_t idx = sb.root_inode;
+    readBlock(mounted_disk, sb.root_inode, &inode);
+    while (inode.type != FREE) {
+        if (!strcmp(inode.fileName, name)) {
+            // this is the right inode
+            
+        }
+        if (!inode.next_inode) return ERROR_DISK_FULL; //TODO: file not found
+        idx = inode.next_inode;
+        readBlock(mounted_disk, idx, &inode);
+    }
+    
+    //file not found - create a file
+    
     return 0;
 }
 int tfs_closeFile(fileDescriptor FD) {
@@ -148,6 +180,7 @@ int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
     return 0;
 }
 int tfs_deleteFile(fileDescriptor FD) {
+    SuperBlock sb;
     return 0;
 }
 int tfs_readByte(fileDescriptor FD, char *buffer) {
