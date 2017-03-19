@@ -24,6 +24,22 @@ typedef struct SuperBlock{
    char data[BLOCKSIZE - 5];
 }SuperBlock;
 
+typedef struct Inode{
+    uint8_t type;
+    uint8_t magic_num;
+    char fileName[8];
+    uint8_t next_inode;
+    uint8_t data_extent;
+    char data[BLOCKSIZE - 12];
+} Inode;
+
+typedef struct Extent{
+    uint8_t type;
+    uint8_t magic_num;
+    uint8_t next_extent;
+    char data[BLOCKSIZE - 3];
+} Extent;
+
 typedef struct FreeBlock {
    uint8_t type;
    uint8_t magic_num;
