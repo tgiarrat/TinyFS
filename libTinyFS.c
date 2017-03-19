@@ -244,7 +244,7 @@ int tfs_deleteFile(fileDescriptor FD) {
         if (inode.type==INODE) inode.next_inode = del.next_inode;
         else return ERROR_BAD_FD;
     }
-        
+    writeBlock(mounted_disk, 0, &sb);    
     
     
     
@@ -261,8 +261,10 @@ int tfs_deleteFile(fileDescriptor FD) {
     //mark inode as free and add to sb free chain
     addToFree(delFT->bNum);
     
+    
+    
+    
     tfs_closeFile(fd);
-    writeBlock(mounted_disk, 0, &sb);
     return 0;
 }
 
