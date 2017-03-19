@@ -34,14 +34,14 @@ int main() {
 
     changePassword(passwordFile, newPasswordFile, password, newPassword);
 
-    diskNum = mountDisk(disk, 0, newPassword, newPasswordFile);
+    diskNum = openDisk(disk, 0, newPassword, newPasswordFile);
     readBlock(diskNum, 4, block);
 
     print_hex("BLOCK\n", block, 4096);
 
 
     /*
-    diskNum = mountDisk(disk, 4096*5, password, passwordFile);
+    diskNum = openDisk(disk, 4096*5, password, passwordFile);
 
     unsigned char block[4096];
     readBlock(diskNum, 2, block);
@@ -100,7 +100,7 @@ int main() {
        0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
        };
 
-       mountDisk("./file.txt", BLOCK_SIZE, key);
+       openDisk("./file.txt", BLOCK_SIZE, key);
 
        unsigned char pt[BLOCK_SIZE];
        memset(pt, 1, BLOCK_SIZE);
