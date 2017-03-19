@@ -246,23 +246,41 @@ int tfs_deleteFile(fileDescriptor FD) {
     }
         
     
-    //mark inode as free and add to sb free chain
-    del.type = FREE;
-    writeBlock(mounted_disk, delFT->bNum, &del);
+    
     
     //mark all extents as free and add to sb free chain
     Extent ext;
+    int temp;
     while (del.data_extent) {
         readBlock(mounted_disk, del.data_extent, &ext);
-        ext.type = FREE;
-        writeBlock(mounted_disk, del.data_extent, &ext);
-        del.data_extent = ext.next_extent;
+        temp = ext.next_extent;
+        addToFree(del.data_extent);
+        del.data_extent = temp;
     }
+    
+    //mark inode as free and add to sb free chain
+    addToFree(delFT->bNum);
     
     tfs_closeFile(fd);
     writeBlock(mounted_disk, 0, &sb);
     return 0;
 }
+
+int addToFree(int bNum)
+{
+    SuperBlock sb;
+    FreeBlock free;
+    FreeBlock tail;
+    readBlock(mounted_disk, 0, &sb);
+    readBlock(mounted_disk, bNum, &free );
+    readBlock(mounted_disk, sb.last_free, &tail );
+    free.type = FREE;
+    free.next_free = 0;
+    tail.next_free = bNum;
+    sb.last_free = bNum;
+    return 0;
+}
+
 int tfs_readByte(fileDescriptor FD, char *buffer) {
     return 0;
 }
