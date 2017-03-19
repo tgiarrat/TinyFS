@@ -154,7 +154,7 @@ FileTableNode* getNode(fileDescriptor fd) {
     return NULL; //node not in file table
 
 }
-
+static int opened = 0;
 fileDescriptor tfs_openFile(char *name) {
     SuperBlock sb;
     FileTableNode *node;
@@ -164,7 +164,7 @@ fileDescriptor tfs_openFile(char *name) {
         if (!strcmp(name, node->name)) return node.fd;
         node = node->next;
     }
-    
+    opened++;
     //not already open so create a new FileTableNode
     node = malloc(sizeof(FileTableNode));
     if (!open_file_table.head) open_file_table.head = node;
@@ -179,7 +179,9 @@ fileDescriptor tfs_openFile(char *name) {
     while (inode.type != FREE) {
         if (!strcmp(inode.fileName, name)) {
             // this is the right inode
-            
+            node->bNum = idx;
+            node->ptr = 0;
+            node->fd = opened;
         }
         if (!inode.next_inode) return ERROR_DISK_FULL; //TODO: file not found
         idx = inode.next_inode;
@@ -187,7 +189,17 @@ fileDescriptor tfs_openFile(char *name) {
     }
     
     //file not found - create a file
+    sb.next_free = inode.next_inode;
+    inode.name = name;
+    inode.data_extent = 0;
     
+    node->bNum = idx;
+    node->ptr = 0;
+    node->fd = opened;
+    
+    //write sb and inode
+    writeBlock(mounted_disk, idx, &inode);
+    writeBlock(mounted_disk, 0, &sb);
     return 0;
 }
 int tfs_closeFile(fileDescriptor FD) {
@@ -214,7 +226,7 @@ int tfs_seek(fileDescriptor FD, int offset) {
         return -1;
     }
 
-    if (readBlock(mounted_disk, file_node->numBytes, &inode) < 0) {
+    if (readBlock(mounted_disk, file_node->bNum, &inode) < 0) {
         return -1;
         //to do: error
     }
