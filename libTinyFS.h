@@ -34,6 +34,7 @@ typedef struct Inode{
     char data[BLOCKSIZE - 13];
 } Inode;
 
+#define EXTENT_SIZE = BLOCKSIZE - 3;
 typedef struct Extent{
     uint8_t type;
     uint8_t magic_num;

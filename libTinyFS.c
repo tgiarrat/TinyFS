@@ -268,8 +268,7 @@ int tfs_deleteFile(fileDescriptor FD) {
     return 0;
 }
 
-int addToFree(int bNum)
-{
+int addToFree(int bNum) {
     SuperBlock sb;
     FreeBlock free;
     FreeBlock tail;
@@ -283,8 +282,37 @@ int addToFree(int bNum)
     return 0;
 }
 
+// set block 
+// get free block
+// 
+
 int tfs_readByte(fileDescriptor FD, char *buffer) {
+    FileTableNode *node = getNode(FD);
+    Inode inode;
+
+    if (file_node == NULL) {
+        //to do: errorr
+        return -1;
+    }
+    if (readBlock(mounted_disk, file_node->bNum, &inode) < 0) {
+        return -1;
+        //to do: error
+    }
+
+    int offset = node->ptr;
+
+    Extent currExtent;
+    readBlock(mounted_disk, node->data_extent, &currExtent);
+
+    while (offset > EXTENT_SIZE) {
+        readBlock(mounted_disk, currExtent->next_extent, &currExtent);
+        offset -= EXTENT_SIZE;
+    }
+
+    *buffer = currExtent.data[offset];
+
     return 0;
+
 }
 int tfs_seek(fileDescriptor FD, int offset) {   
     FileTableNode *file_node;
