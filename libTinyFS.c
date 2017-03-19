@@ -225,11 +225,11 @@ int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
     FileTableNode *node = getNode(FD);
     Inode inode;
 
-    if (file_node == NULL) {
+    if (node == NULL) {
         //to do: errorr
         return -1;
     }
-    if (readBlock(mounted_disk, file_node->bNum, &inode) < 0) {
+    if (readBlock(mounted_disk, node->bNum, &inode) < 0) {
         return -1;
         //to do: error
     }
@@ -238,6 +238,7 @@ int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
         // create an inode
     }
 
+    /*
     assert inode.type == INODE;
     // clear out all extents of INode
     int next_extent = inode.data_extent;
@@ -282,6 +283,7 @@ int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
     *buffer = currExtent.data[offset];
 
     return 0;
+    */
     return 0;
 }
 int tfs_deleteFile(fileDescriptor FD) {
@@ -350,11 +352,11 @@ int tfs_readByte(fileDescriptor FD, char *buffer) {
     FileTableNode *node = getNode(FD);
     Inode inode;
 
-    if (file_node == NULL) {
+    if (node == NULL) {
         //to do: errorr
         return -1;
     }
-    if (readBlock(mounted_disk, file_node->bNum, &inode) < 0) {
+    if (readBlock(mounted_disk, node->bNum, &inode) < 0) {
         return -1;
         //to do: error
     }
@@ -362,10 +364,10 @@ int tfs_readByte(fileDescriptor FD, char *buffer) {
     int offset = node->ptr;
 
     Extent currExtent;
-    readBlock(mounted_disk, node->data_extent, &currExtent);
+    readBlock(mounted_disk, inode.data_extent, &currExtent);
 
     while (offset > EXTENT_SIZE) {
-        readBlock(mounted_disk, currExtent->next_extent, &currExtent);
+        readBlock(mounted_disk, currExtent.next_extent, &currExtent);
         offset -= EXTENT_SIZE;
     }
 
