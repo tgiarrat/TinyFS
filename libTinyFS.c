@@ -64,6 +64,7 @@ int tfs_mkfs(char *filename, int nBytes, char *password, char *masterKeyFile) {
     if (diskNum < 0)
     {   // error
         //to do: handle open disk error
+        return -1; 
     }
 
     //format the file to be a mountable disk
@@ -138,6 +139,22 @@ int tfs_unmount(void)
 	free(curNode);
     return 0;
 }
+
+//returns file in the file table with the file descriptor
+FileTableNode* getNode(fileDescriptor fd) {
+    FileTableNode *node = open_file_table.head;
+
+    while (node) {
+        if (node->fd == fd) {
+                return node;
+        }
+        node = node->next;
+    }
+
+    return NULL; //node not in file table
+
+}
+
 fileDescriptor tfs_openFile(char *name) {
     SuperBlock sb;
     FileTableNode *node;
@@ -186,6 +203,26 @@ int tfs_deleteFile(fileDescriptor FD) {
 int tfs_readByte(fileDescriptor FD, char *buffer) {
     return 0;
 }
-int tfs_seek(fileDescriptor FD, int offset) {
-    return 0;
+int tfs_seek(fileDescriptor FD, int offset) {   
+    FileTableNode *file_node;
+    Inode inode;
+
+    file_node = getFile(fd);
+
+    if (file_node == NULL) {
+        //to do: errorr
+        return -1;
+    }
+
+    if (readBlock(mounted_disk, file_node->numBytes, &inode) < 0) {
+        return -1;
+        //to do: error
+    }
+    if (offset < 0 || offset >= inode.size) {
+        return -1;
+        //to do: error
+    }
+
+    file_node->ptr = offset
+    return 1;
 }

@@ -14,6 +14,7 @@
 #define DEFAULT_DISK_NAME “tinyFSDisk”
 
 typedef int fileDescriptor;
+typedef struct FileTableNode FileTableNode;
 
 typedef struct SuperBlock{
    uint8_t type;
