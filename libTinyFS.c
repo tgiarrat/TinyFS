@@ -222,6 +222,66 @@ int tfs_closeFile(fileDescriptor FD) {
     return ERROR_BAD_FD; 
 }
 int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
+    FileTableNode *node = getNode(FD);
+    Inode inode;
+
+    if (file_node == NULL) {
+        //to do: errorr
+        return -1;
+    }
+    if (readBlock(mounted_disk, file_node->bNum, &inode) < 0) {
+        return -1;
+        //to do: error
+    }
+
+    if (inode.type == FREE) {
+        // create an inode
+    }
+
+    assert inode.type == INODE;
+    // clear out all extents of INode
+    int next_extent = inode.data_extent;
+    inode.data_extent = 0;
+
+    Extent curr_extent;
+
+    while (next_extent > 0) {
+        readBlock(mounted_disk, next_extent, &curr_extent);
+        curr_extent.type = FREE;
+        next_extent = curr_extent.next_extent;
+
+        offset -= EXTENT_SIZE;
+    }
+
+    assert inode.data_extent = 0;
+
+    Extent next_extent;
+
+    // write extents
+    while (size > EXTENT_SIZE) { 
+ //       next_extent = 
+        // write buffer
+        
+        
+        size -= EXTENT_SIZE;
+    }
+
+
+
+    // WRITE THE INODE BACK TO THE DISK
+    int offset = node->ptr;
+
+    Extent currExtent;
+    readBlock(mounted_disk, node->data_extent, &currExtent);
+
+    while (offset > EXTENT_SIZE) {
+        readBlock(mounted_disk, currExtent->next_extent, &currExtent);
+        offset -= EXTENT_SIZE;
+    }
+
+    *buffer = currExtent.data[offset];
+
+    return 0;
     return 0;
 }
 int tfs_deleteFile(fileDescriptor FD) {
