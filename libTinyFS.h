@@ -28,10 +28,10 @@ typedef struct SuperBlock{
 typedef struct Inode{
     uint8_t type;
     uint8_t magic_num;
-    char fileName[8];
+    char fileName[9];
     uint8_t next_inode;
     uint8_t data_extent;
-    char data[BLOCKSIZE - 12];
+    char data[BLOCKSIZE - 13];
 } Inode;
 
 typedef struct Extent{
