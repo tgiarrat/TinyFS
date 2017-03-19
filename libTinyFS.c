@@ -5,6 +5,7 @@
 #include <string.h>
 #include "libTinyFS.h"
 #include "libDisk.h"
+#include "tinyFS_errno.h"
 
 enum blockType {
     SUPERBLOCK = 1,
@@ -31,8 +32,7 @@ static int init_superblock(int blkCount, int diskNum) {
 
     if (writeBlock(diskNum, 0, &sBlk) < 0)
     {
-        //to do: error
-        return -1;
+        return ERROR_WRITE_BLOCK;
     }
 
     FreeBlock fBlk;
@@ -51,7 +51,7 @@ static int init_superblock(int blkCount, int diskNum) {
 
     	if (writeBlock(diskNum, i, &fBlk) < 0) {
     		//to do: error
-            return -1;
+            return ERROR_WRITE_BLOCK;
     	}
     }
     return 0;
@@ -81,11 +81,11 @@ int tfs_mount(char *diskname, char *password, char *masterKeyFile) {
 
     if (system_mounted){
         //to do: proper error shit
-        return -2; 
+        return ERROR_MOUNTDISK; 
     }
 
     if (diskname == NULL) {
-        return -2;
+        return ERROR_NO_DISKNAME;
         //to do: proper error checking
     }
 
@@ -93,7 +93,7 @@ int tfs_mount(char *diskname, char *password, char *masterKeyFile) {
 
     if (mounted_disk == -1) {
         //to do : error
-        return -2;
+        return ERROR_MOUNTDISK;
     }
 
     system_mounted = 1;
@@ -102,25 +102,25 @@ int tfs_mount(char *diskname, char *password, char *masterKeyFile) {
         readBlock(mounted_disk, i, block);
         if(block[1] != MAGIC_NUM) { //not of tinyfs type
             //to do: error 
-            return -2;          
+            return ERROR_MOUNTDISK;          
         }
     }
 
     //init file table?
 
-    open_file_table->head = NULL;
-    open_file_table->tail = NULL;
-    open_file_table->numOpenFiles = 0;
-    open_file_table->lastFile = 0;
+    open_file_table.head = NULL;
+    open_file_table.tail = NULL;
+    open_file_table.numOpenFiles = 0;
+    open_file_table.lastFile = 0;
     //open_file_table->maxFiles = ;
 
 
     return 0;
 }
-int tfs_unmount(void)
+int tfs_unmount() {
 
     if (system_mounted == 0) {
-        return -1; 
+        return ERROR_UNMOUNTDISK; 
         //to do error
     }
 
@@ -129,7 +129,7 @@ int tfs_unmount(void)
 
 
     //clean up open file table
-    FileTableNode *curNode = open_file_table->head;
+    FileTableNode *curNode = open_file_table.head;
     FileTableNode *temp;
 	while (curNode) {
 		temp = curNode;
@@ -161,7 +161,7 @@ fileDescriptor tfs_openFile(char *name) {
     //check if already open
     node = open_file_table.head;
     while (node) {
-        if (!strcmp(name, node->name)) return node.fd;
+        if (!strcmp(name, node->name)) return node->fd;
         node = node->next;
     }
     opened++;
@@ -191,7 +191,7 @@ fileDescriptor tfs_openFile(char *name) {
     
     //file not found - create a file
     sb.next_free = inode.next_inode;
-    inode.name = name;
+    memcpy(inode.fileName,name, strlen(name) + 1);
     inode.data_extent = 0;
     
     node->bNum = idx;
@@ -208,7 +208,7 @@ int tfs_closeFile(fileDescriptor FD) {
     FileTableNode *prev;
     prev = 0;
     while (node) {
-        if (node->fd == fd) {
+        if (node->fd == FD) {
                 if (prev) prev->next = node->next;
                 else open_file_table.head = node->next;
                 if (open_file_table.tail == node)
@@ -219,7 +219,7 @@ int tfs_closeFile(fileDescriptor FD) {
         prev = node;
         node = node->next;
     }
-    return ERROR_BAD_FD; 
+    return ERROR_BAD_FD;
 }
 int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
     return 0;
@@ -264,7 +264,7 @@ int tfs_deleteFile(fileDescriptor FD) {
     
     
     
-    tfs_closeFile(fd);
+    tfs_closeFile(FD);
     return 0;
 }
 
@@ -318,7 +318,7 @@ int tfs_seek(fileDescriptor FD, int offset) {
     FileTableNode *file_node;
     Inode inode;
 
-    file_node = getFile(fd);
+    file_node = getNode(FD);
 
     if (file_node == NULL) {
         //to do: errorr
@@ -329,11 +329,14 @@ int tfs_seek(fileDescriptor FD, int offset) {
         return -1;
         //to do: error
     }
-    if (offset < 0 || offset >= inode.size) {
+    if (offset < 0 /* || offset >= inode.size */ ) {
         return -1;
         //to do: error
     }
 
     file_node->ptr = offset;
     return 1;
+}
+int tfs_displayFragments() {
+    
 }
