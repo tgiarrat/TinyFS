@@ -203,7 +203,22 @@ fileDescriptor tfs_openFile(char *name) {
     return 0;
 }
 int tfs_closeFile(fileDescriptor FD) {
-    return 0; 
+    FileTableNode *node = open_file_table.head;
+    FileTableNode *prev;
+    prev = 0;
+    while (node) {
+        if (node->fd == fd) {
+                if (prev) prev->next = node->next;
+                else open_file_table.head = node->next;
+                if (open_file_table.tail == node)
+                    open_file_table.tail = prev;
+                free(node);
+                return SUCCESS;
+        }
+        prev = node;
+        node = node->next;
+    }
+    return ERROR_BAD_FD; 
 }
 int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
     return 0;
