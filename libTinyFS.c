@@ -381,7 +381,7 @@ int tfs_rename(fileDescriptor FD, char* newName) {
         return ERROR_BAD_FD;
     }
     if (readBlock(mounted_disk, node->bNum, &inode) < 0) {
-        return ERROR_READ_BLOCK;;
+        return ERROR_READ_BLOCK;
     }
     memcpy(node->name, newName, strlen(newName));
     memcpy(inode.fileName, newName, strlen(newName));

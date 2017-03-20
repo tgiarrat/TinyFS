@@ -7,11 +7,15 @@ LIBFLAGS= -lcrypto -lsodium -lssl
 CFLAGS=$(pkg-config --cflags libsodium)
 LDFLAGS=$(pkg-config --libs libsodium)
 
+all:
+	make DiskMain
+	make TinyFSMain
+
 ############
 # LIB DISK #
 ############
 DiskMain: libDisk.o libDisk.h
-	gcc $(FLAGS) $(CFLAGS) $(LDFLAGS) DiskMain.c *.o libDisk.h $(LIBFLAGS) -o DiskMain
+	gcc $(FLAGS) $(CFLAGS) $(LDFLAGS) EncryptionDemoDriver.c *.o libDisk.h $(LIBFLAGS) -o encryptionDemo
 
 libDisk.o: libDisk.c libDisk.h
 	gcc $(FLAGS) -c libDisk.c libDisk.h

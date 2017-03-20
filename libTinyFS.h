@@ -3,6 +3,7 @@
 #define LIBTINYFS_H
 
 #include <stdint.h>
+#include "tinyFS_errno.h"
 
 //#pragma pack(1)
 /* The default size of the disk and file system block */

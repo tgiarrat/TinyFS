@@ -1,5 +1,3 @@
-#define SUCCESS 0
-
 #define ERROR_DISK_FULL -11
 #define ERROR_WRITE_BLOCK -12
 #define ERROR_NO_DISKNAME -13

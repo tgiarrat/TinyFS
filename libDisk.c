@@ -18,7 +18,7 @@ int generateMasterKey(char *file, char *password, unsigned char *key, unsigned c
         generateRandomData(keyArray, AES_KEY_SIZE);
     }
 
-    print_hex("GENERATED KEY:: ", key, AES_KEY_SIZE);
+    //print_hex("GENERATED KEY:: ", key, AES_KEY_SIZE);
     if (iv == NULL)  {
         unsigned char ivArray[AES_IV_SIZE];
         iv = ivArray;
@@ -30,8 +30,8 @@ int generateMasterKey(char *file, char *password, unsigned char *key, unsigned c
 
     unsigned char masterKeyMaterial[MASTER_KEY_MATERIAL_SIZE];
 
-    print_hex("iv: ", iv, AES_IV_SIZE);
-    print_hex("salt: ", salt, SALT_SIZE);
+    //print_hex("iv: ", iv, AES_IV_SIZE);
+    //print_hex("salt: ", salt, SALT_SIZE);
     // appending encrypted key
     aesXorMasterKey(key, password, salt, iv, masterKeyMaterial);
 
@@ -62,11 +62,11 @@ int extractMasterKey(char *file, char *password, unsigned char *keyOut, unsigned
 
     // extracting the iv
     memcpy(ivOut, masterKeyMaterial+AES_KEY_SIZE, AES_IV_SIZE);
-    print_hex("iv: ", ivOut, AES_IV_SIZE);
+    //print_hex("iv: ", ivOut, AES_IV_SIZE);
 
     unsigned char salt[SALT_SIZE];
     memcpy(salt, masterKeyMaterial+AES_KEY_SIZE+AES_IV_SIZE, SALT_SIZE);
-    print_hex("salt: ", salt, SALT_SIZE);
+    //print_hex("salt: ", salt, SALT_SIZE);
 
     // extracting the masterKey
     return aesXorMasterKey(keyEncrypted, password, salt, ivOut, keyOut);
@@ -77,7 +77,7 @@ int aesXorMasterKey(unsigned char *masterKeyIn, char *password, unsigned char *s
     unsigned char flattenedKey[AES_KEY_SIZE];
     PBKDF(password, salt, flattenedKey);
 
-    print_hex("flatkey: ", flattenedKey, AES_KEY_SIZE);
+    //print_hex("flatkey: ", flattenedKey, AES_KEY_SIZE);
 
     unsigned char *ivTmp = malloc(AES_IV_SIZE);
     memcpy(ivTmp, iv, AES_IV_SIZE);
@@ -140,7 +140,7 @@ int openDisk(char *filename, int nBytes, char *password, char *masterKeyFile) {
     // sodium_mlock(disk->key, AES_KEY_SIZE);
 
     extractMasterKey(masterKeyFile, password, disk->key, disk->iv);
-    print_hex("UNLOCKED KEY:: ", disk->key, AES_KEY_SIZE);
+    //print_hex("UNLOCKED KEY:: ", disk->key, AES_KEY_SIZE);
 
     // creating a disk for the first time
     if (nBytes > 0) {
