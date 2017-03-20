@@ -17,7 +17,13 @@ int main() {
 
     tfs_mkfs(diskFileName, 256*256, password, masterKeyFile);
     tfs_mount(diskFileName, password, masterKeyFile);
-
+    tfs_openFile("test");
+    //tfs_writefile(x, "testMe", 7);
+    //char test[7];
+    //for (int i = 0; i < 7; i++) {
+    //    tfs_readByte
+    //    printf("%c", )
+    //}
     // DO TINY FS THINGS HERE
     // tfs_mount(diskFileName, password, masterKeyFile)
 

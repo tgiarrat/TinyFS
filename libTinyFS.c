@@ -40,7 +40,7 @@ static int init_superblock(int blkCount, int diskNum) {
     fBlk.magic_num = MAGIC_NUM;
 	int i;
 
-	for (i = 2; i < blkCount; i++) {
+	for (i = 1; i < blkCount; i++) {
         if (i == blkCount - 1){
             fBlk.next_free = 0;
         }
