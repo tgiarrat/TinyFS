@@ -14,8 +14,8 @@ int main() {
     generateMasterKey(passwordFile, password, NULL, NULL);
 
     // open a new disk with the password file
-    int diskNum = openDisk(disk, 4096*5, password, passwordFile);
-    unsigned char block[4096];
+    int diskNum = openDisk(disk, BLOCK_SIZE*5, password, passwordFile);
+    unsigned char block[BLOCK_SIZE];
     readBlock(diskNum, 0, block);
     readBlock(diskNum, 1, block);
     readBlock(diskNum, 2, block);
@@ -37,7 +37,7 @@ int main() {
     diskNum = openDisk(disk, 0, newPassword, newPasswordFile);
     readBlock(diskNum, 4, block);
 
-    print_hex("BLOCK\n", block, 4096);
+    print_hex("BLOCK\n", block, BLOCK_SIZE);
     closeDisk(diskNum);
     
     printf("DISK CLOSED\n");
