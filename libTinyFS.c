@@ -225,9 +225,44 @@ int tfs_closeFile(fileDescriptor FD) {
     return ERROR_BAD_FD;
 }
 int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
+    SuperBlock sb;
+    readBlock(mounted_disk, 0, &sb);
+
     FileTableNode *node = getNode(FD);
     Inode inode;
+    Extent ext;
+    int pos = 0;
+    readBlock(mounted_disk, node->bNum, &inode);
+    //clear old data
+    //mark all extents as free and add to sb free chain
+    int temp;
+    while (inode.data_extent) {
+        readBlock(mounted_disk, inode.data_extent, &ext);
+        temp = ext.next_extent;
+        addToFree(inode.data_extent);
+        inode.data_extent = temp;
+    }
+    ext = (Extent) inode;
+    ext.next_extent = sb.next_free;
 
+    int prev = node->bNum;
+    while (pos < size) {
+        if (pos % EXTENT_SIZE == 0) { // new Extent
+            writeBlock(mounted_disk, prev, ext);
+            prev = ext.next_extent;
+            readBlock(mounted_disk, ext.next_extent, &ext);
+        }
+        ext.data[pos % EXTENT_SIZE] = buffer[pos];
+        pos++;
+    }
+    sb.next_free = ext.next_extent;
+    ext.next_extent = 0;
+    
+    writeBlock(mounted_disk, 0, &sb);
+    return 0;
+}    
+    
+    /*
     if (node == NULL) {
         //to do: errorr
         return -1;
@@ -241,7 +276,7 @@ int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
         // create an inode
     }
 
-    /*
+    
     assert inode.type == INODE;
     // clear out all extents of INode
     int next_extent = inode.data_extent;
@@ -287,8 +322,7 @@ int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
 
     return 0;
     */
-    return 0;
-}
+
 int tfs_deleteFile(fileDescriptor FD) {
     SuperBlock sb;
     readBlock(mounted_disk, 0, &sb);
