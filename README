@@ -2,6 +2,9 @@ Names: Kyle Rosenthal, Thomas Giarratana, Jackson Darrow
 
  Our implementation of tinyFS works by creating superblock that holds the heads to two linked lists. The first linked list keeps track of all the inodes. An inode is a single file in our system. Each inode has a linked list of extents that hold the file contents. The second linked list in the superblock is the free blocks linked list that maintains all the free blocks availible in the files system.
 
- we chose security for fun :^) semantically secure under induy-cpa2
+We have chosen to implement full-disk encryption. 
+    - It is semantically secure under ind-cpa2
+    - the password can be changed without reencrypting the disk
+We have chosen to implement 
 
  none at all :)
