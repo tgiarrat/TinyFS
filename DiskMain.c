@@ -38,6 +38,11 @@ int main() {
     readBlock(diskNum, 4, block);
 
     print_hex("BLOCK\n", block, 4096);
+    closeDisk(diskNum);
+    
+    printf("DISK CLOSED\n");
+
+    openDisk(disk, 0, password, passwordFile);
 
 
     /*
