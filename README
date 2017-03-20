@@ -12,3 +12,7 @@ We have chosen to implement directory listing and renaming
 Limitations/Bugs/Notes:
     - File Descriptor errors may appear after opening more than MAX_INT files. This is because we simply chose to increment an integer to represent new file descriptors. 
     - libssl-dev and libsodium must be installed due to the implementation of encryption.
+
+
+
+SPECIAL NOTE: YOU MUST INSTALL LIBSODIUM AND LIBSSL-DEV IN ORDER TO RUN THE PROGRAM
