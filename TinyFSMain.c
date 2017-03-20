@@ -48,22 +48,22 @@ int main() {
     tfs_readByte(x, test);
     printf("Third byte:%c:%X\n\n", test[0], test[0]);
 
-    printf("Testing readdir... ");
+    printf("Testing readdir... \n");
     tfs_readdir();
     printf("done\n");
 
-    printf("Testing file renaming... ");
+    printf("Testing file renaming... \n");
     tfs_rename(x,"renamed");
     tfs_readdir();
-    printf(" done\n");
+    printf("done\n");
     
 
-    printf("Testing file deleition... ");
+    printf("Testing file deleition... \n");
     tfs_deleteFile(x);
     printf("\nTest:%c:%X\n", test[0], test[0]);
     printf("done\n");
 
-    printf("Testing unmount... ");
+    printf("Testing unmount... \n");
     tfs_unmount();
     printf("done\n");
 

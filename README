@@ -1,10 +1,14 @@
-Names: Kyle Rosenthal, Thomas Giarratana, Jackson Darrow
+Names: Thomas Giarratana, Kyle Rosenthal, Jackson "mean boy" Darrow
 
  Our implementation of tinyFS works by creating superblock that holds the heads to two linked lists. The first linked list keeps track of all the inodes. An inode is a single file in our system. Each inode has a linked list of extents that hold the file contents. The second linked list in the superblock is the free blocks linked list that maintains all the free blocks availible in the files system.
 
 We have chosen to implement full-disk encryption. 
     - It is semantically secure under ind-cpa2
     - the password can be changed without reencrypting the disk
-We have chosen to implement 
+    - we show what it works by demonstrating the ability to read and write to an encrypted file system
+We have chosen to implement directory listing and renaming
+    - We have chosen to demonstrate this functionlity by calling readdir as well as renaming the file and checking that it has been changed.
 
- none at all :)
+Limitations/Bugs/Notes:
+    - File Descriptor errors may appear after opening more than MAX_INT files. This is because we simply chose to increment an integer to represent new file descriptors. 
+    - libssl-dev and libsodium must be installed due to the implementation of encryption.
