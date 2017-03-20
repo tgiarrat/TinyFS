@@ -15,7 +15,7 @@ int main() {
     // dont worry about this
     generateMasterKey(masterKeyFile, password, NULL, NULL);
 
-    tfs_mount(diskFileName, masterKeyFile, password);
+    tfs_mount(diskFileName, password, masterKeyFile);
 
     // DO TINY FS THINGS HERE
     // tfs_mount(diskFileName, password, masterKeyFile)
