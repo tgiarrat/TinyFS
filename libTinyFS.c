@@ -290,7 +290,6 @@ int tfs_deleteFile(fileDescriptor FD) {
     SuperBlock sb;
     readBlock(mounted_disk, 0, &sb);
     Inode inode;
-    uint8_t idx = sb.root_inode;
     readBlock(mounted_disk, sb.root_inode, &inode);
     FileTableNode *delFT = getNode(FD);
     Inode del;
@@ -400,5 +399,5 @@ int tfs_seek(fileDescriptor FD, int offset) {
     return 1;
 }
 int tfs_displayFragments() {
-    
+    return 0;    
 }
