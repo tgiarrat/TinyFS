@@ -1,4 +1,4 @@
-Names: Thomas Giarratana, Kyle Rosenthal, Jackson "mean boy" Darrow
+Names(reversed): Thomas Giarratana, Kyle Rosenthal, Jackson "mean boy" Darrow
 
  Our implementation of tinyFS works by creating superblock that holds the heads to two linked lists. The first linked list keeps track of all the inodes. An inode is a single file in our system. Each inode has a linked list of extents that hold the file contents. The second linked list in the superblock is the free blocks linked list that maintains all the free blocks availible in the files system.
 
