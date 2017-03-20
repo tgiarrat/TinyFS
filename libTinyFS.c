@@ -50,7 +50,6 @@ static int init_superblock(int blkCount, int diskNum) {
     	memset(fBlk.data, 0, BLOCKSIZE-3);
 
     	if (writeBlock(diskNum, i, &fBlk) < 0) {
-    		//to do: error
             return ERROR_WRITE_BLOCK;
     	}
     }
@@ -58,13 +57,12 @@ static int init_superblock(int blkCount, int diskNum) {
 }
 
 int tfs_mkfs(char *filename, int nBytes, char *password, char *masterKeyFile) {
-    //todo: error check for num bytes
+    //to do: error check for num bytes
 
     int diskNum = openDisk(filename, nBytes, password, masterKeyFile);
     if (diskNum < 0)
     {   // error
-        //to do: handle open disk error
-        return -1; 
+        return ERROR_BAD_FILE; 
     }
 
     //format the file to be a mountable disk
@@ -82,19 +80,16 @@ int tfs_mount(char *diskname, char *password, char *masterKeyFile) {
     int i = 0;
 
     if (system_mounted){
-        //to do: proper error shit
         return ERROR_MOUNTDISK; 
     }
 
+
     if (diskname == NULL) {
         return ERROR_NO_DISKNAME;
-        //to do: proper error checking
     }
-
     mounted_disk = openDisk(diskname, 0, password, masterKeyFile); //0 means existing disk opens
 
     if (mounted_disk == -1) {
-        //to do : error
         return ERROR_MOUNTDISK;
     }
 
@@ -102,20 +97,16 @@ int tfs_mount(char *diskname, char *password, char *masterKeyFile) {
 
     for(;i < block_count; i++) {
         readBlock(mounted_disk, i, block);
-        if(block[1] != MAGIC_NUM) { //not of tinyfs type
-            //to do: error 
+        if(block[1] != MAGIC_NUM) { 
+            //not of tinyfs type
             return ERROR_MOUNTDISK;          
         }
     }
-
-    //init file table?
 
     open_file_table.head = NULL;
     open_file_table.tail = NULL;
     open_file_table.numOpenFiles = 0;
     open_file_table.lastFile = 0;
-    //open_file_table->maxFiles = ;
-
 
     return 0;
 }
@@ -123,10 +114,9 @@ int tfs_unmount() {
 
     if (system_mounted == 0) {
         return ERROR_UNMOUNTDISK; 
-        //to do error
     }
     closeDisk(mounted_disk);
-    mounted_disk = -1; //to do: check later
+    mounted_disk = -1; 
     system_mounted = 0;
 
 
@@ -337,12 +327,10 @@ int tfs_readByte(fileDescriptor FD, char *buffer) {
     Inode inode;
 
     if (node == NULL) {
-        //to do: errorr
-        return -1;
+        return ERROR_BAD_FD;
     }
     if (readBlock(mounted_disk, node->bNum, &inode) < 0) {
-        return -1;
-        //to do: error
+        return ERROR_READ_BLOCK;
     }
 
     int offset = node->ptr;
@@ -370,17 +358,14 @@ int tfs_seek(fileDescriptor FD, int offset) {
     file_node = getNode(FD);
 
     if (file_node == NULL) {
-        //to do: errorr
-        return -1;
+        return ERROR_BAD_FD;
     }
 
     if (readBlock(mounted_disk, file_node->bNum, &inode) < 0) {
-        return -1;
-        //to do: error
+        return ERROR_READ_BLOCK;
     }
     if (offset < 0 /* || offset >= inode.size */ ) {
-        return -1;
-        //to do: error
+        return ERROR_BOUNDRIES;
     }
 
     file_node->ptr = offset;
@@ -393,12 +378,10 @@ int tfs_rename(fileDescriptor FD, char* newName) {
     Inode inode;
 
     if (node == NULL) {
-        //to do: errorr
         return ERROR_BAD_FD;
     }
     if (readBlock(mounted_disk, node->bNum, &inode) < 0) {
-        return -1;
-        //to do: error
+        return ERROR_READ_BLOCK;;
     }
     memcpy(node->name, newName, strlen(newName));
     memcpy(inode.fileName, newName, strlen(newName));
