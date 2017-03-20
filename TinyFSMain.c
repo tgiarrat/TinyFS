@@ -15,11 +15,13 @@ int main() {
     // dont worry about this
     generateMasterKey(masterKeyFile, password, NULL, NULL);
 
+    tfs_mkfs(diskFileName, 256*256, password, masterKeyFile);
     tfs_mount(diskFileName, password, masterKeyFile);
 
     // DO TINY FS THINGS HERE
     // tfs_mount(diskFileName, password, masterKeyFile)
 
+    
     tfs_unmount();
 
     return 0;

@@ -93,4 +93,6 @@ int tfs_seek(fileDescriptor FD, int offset);
 int addToFree(int bNum);
 
 FileTableNode* getNode(fileDescriptor fd);
+
+int tfs_displayFragments();
 #endif

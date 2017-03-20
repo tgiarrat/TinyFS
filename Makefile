@@ -23,7 +23,8 @@ libDisk.c: libDisk.h
 ###############
 # LIB TINY FS #
 ###############
-TinyFSMain: libTinyFS.o libTinyFS.h
+TinyFSMain: libTinyFS.o libTinyFS.h TinyFSMain.c
+	make DiskMain
 	gcc $(FLAGS) $(CFLAGS) $(LDFLAGS) TinyFSMain.c *.o libDisk.h libTinyFS.h $(LIBFLAGS) -o TinyFSMain
 
 libTinyFS.o: libTinyFS.c libTinyFS.h
