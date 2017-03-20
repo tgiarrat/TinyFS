@@ -1,5 +1,5 @@
 
-FLAGS = -Wall -Werror -g
+FLAGS = -std=c99 -Wall -Werror -g
 NAME = tinyFsDemo
 LIB = tinyFSlib.a
 
