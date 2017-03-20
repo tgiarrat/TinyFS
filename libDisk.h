@@ -9,7 +9,7 @@
 #include <openssl/sha.h>
 #include <sodium.h>
 
-#define BLOCK_SIZE 4096 // bytes
+#define BLOCK_SIZE 256 // bytes
 #define AES_BLOCK_SIZE_BITS 128
 #define AES_KEY_SIZE 16
 #define AES_KEY_SIZE_BITS 128
