@@ -17,15 +17,22 @@ int main() {
 
     tfs_mkfs(diskFileName, 256*256, password, masterKeyFile);
     tfs_mount(diskFileName, password, masterKeyFile);
-    tfs_openFile("test");
-    //tfs_writefile(x, "testMe", 7);
-    //char test[7];
-    //for (int i = 0; i < 7; i++) {
-    //    tfs_readByte
-    //    printf("%c", )
-    //}
-    // DO TINY FS THINGS HERE
-    // tfs_mount(diskFileName, password, masterKeyFile)
+    int x = tfs_openFile("test");
+    tfs_writeFile(x, "testMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMetestMe", 337);
+
+    char test[7];
+    for (int i = 0; i < 7; i++) {
+        tfs_readByte(x, test);
+        printf("\nTest:%c:%X\n", test[0], test[0]);
+    }
+    tfs_seek(x, 2);
+    tfs_readByte(x, test);
+    tfs_readdir();
+    tfs_rename(x,"renamed");
+    tfs_readdir();
+    
+    tfs_deleteFile(x);
+    printf("\nTest:%c:%X\n", test[0], test[0]);
 
     
     tfs_unmount();

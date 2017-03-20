@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-
+//#pragma pack(1)
 /* The default size of the disk and file system block */
 #define BLOCKSIZE 256
 #define MAGIC_NUM 0x44
@@ -94,5 +94,7 @@ int addToFree(int bNum);
 
 FileTableNode* getNode(fileDescriptor fd);
 
-int tfs_displayFragments();
+int tfs_readdir();
+
+int tfs_rename(fileDescriptor FD, char* newName);
 #endif

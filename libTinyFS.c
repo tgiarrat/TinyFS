@@ -169,7 +169,7 @@ fileDescriptor tfs_openFile(char *name) {
     }
     opened++;
     //not already open so create a new FileTableNode
-    node = malloc(sizeof(FileTableNode));
+    node = calloc(sizeof(FileTableNode), 1);
     if (!open_file_table.head) open_file_table.head = node;
     if (open_file_table.tail) open_file_table.tail->next = node;
     open_file_table.tail = node;
@@ -196,7 +196,9 @@ fileDescriptor tfs_openFile(char *name) {
     sb.next_free = inode.next_inode;
     memcpy(inode.fileName,name, strlen(name) + 1);
     inode.data_extent = 0;
+    inode.type = INODE;
     
+    memcpy(node->name,name, strlen(name) + 1);
     node->bNum = idx;
     node->ptr = 0;
     node->fd = opened;
@@ -204,7 +206,7 @@ fileDescriptor tfs_openFile(char *name) {
     //write sb and inode
     writeBlock(mounted_disk, idx, &inode);
     writeBlock(mounted_disk, 0, &sb);
-    return 0;
+    return opened;
 }
 int tfs_closeFile(fileDescriptor FD) {
     FileTableNode *node = open_file_table.head;
@@ -242,86 +244,32 @@ int tfs_writeFile(fileDescriptor FD, char *buffer, int size) {
         addToFree(inode.data_extent);
         inode.data_extent = temp;
     }
-    ext = (Extent) inode;
-    ext.next_extent = sb.next_free;
+
+    //hack to save time/code
+    inode.data_extent = sb.next_free;
+    memcpy(&ext, &inode, BLOCK_SIZE);
+
 
     int prev = node->bNum;
     while (pos < size) {
         if (pos % EXTENT_SIZE == 0) { // new Extent
-            writeBlock(mounted_disk, prev, ext);
+            writeBlock(mounted_disk, prev, &ext);
             prev = ext.next_extent;
             readBlock(mounted_disk, ext.next_extent, &ext);
+            ext.type = FILE_EXTENT;
         }
         ext.data[pos % EXTENT_SIZE] = buffer[pos];
         pos++;
     }
     sb.next_free = ext.next_extent;
     ext.next_extent = 0;
+
+    writeBlock(mounted_disk, prev, &ext);
     
     writeBlock(mounted_disk, 0, &sb);
     return 0;
 }    
     
-    /*
-    if (node == NULL) {
-        //to do: errorr
-        return -1;
-    }
-    if (readBlock(mounted_disk, node->bNum, &inode) < 0) {
-        return -1;
-        //to do: error
-    }
-
-    if (inode.type == FREE) {
-        // create an inode
-    }
-
-    
-    assert inode.type == INODE;
-    // clear out all extents of INode
-    int next_extent = inode.data_extent;
-    inode.data_extent = 0;
-
-    Extent curr_extent;
-
-    while (next_extent > 0) {
-        readBlock(mounted_disk, next_extent, &curr_extent);
-        curr_extent.type = FREE;
-        next_extent = curr_extent.next_extent;
-
-        offset -= EXTENT_SIZE;
-    }
-
-    assert inode.data_extent = 0;
-
-    Extent next_extent;
-
-    // write extents
-    while (size > EXTENT_SIZE) { 
- //       next_extent = 
-        // write buffer
-        
-        
-        size -= EXTENT_SIZE;
-    }
-
-
-
-    // WRITE THE INODE BACK TO THE DISK
-    int offset = node->ptr;
-
-    Extent currExtent;
-    readBlock(mounted_disk, node->data_extent, &currExtent);
-
-    while (offset > EXTENT_SIZE) {
-        readBlock(mounted_disk, currExtent->next_extent, &currExtent);
-        offset -= EXTENT_SIZE;
-    }
-
-    *buffer = currExtent.data[offset];
-
-    return 0;
-    */
 
 int tfs_deleteFile(fileDescriptor FD) {
     SuperBlock sb;
@@ -403,12 +351,15 @@ int tfs_readByte(fileDescriptor FD, char *buffer) {
     readBlock(mounted_disk, inode.data_extent, &currExtent);
 
     while (offset > EXTENT_SIZE) {
+        print_hex("Extent ", (unsigned char *) currExtent.data, EXTENT_SIZE);
         readBlock(mounted_disk, currExtent.next_extent, &currExtent);
         offset -= EXTENT_SIZE;
+        
     }
+        print_hex("Extent ", (unsigned char *) currExtent.data, EXTENT_SIZE);
 
     *buffer = currExtent.data[offset];
-
+    node->ptr++;
     return 0;
 
 }
@@ -435,6 +386,38 @@ int tfs_seek(fileDescriptor FD, int offset) {
     file_node->ptr = offset;
     return 1;
 }
-int tfs_displayFragments() {
-    return 0;    
+
+
+int tfs_rename(fileDescriptor FD, char* newName) {
+    FileTableNode *node = getNode(FD);
+    Inode inode;
+
+    if (node == NULL) {
+        //to do: errorr
+        return ERROR_BAD_FD;
+    }
+    if (readBlock(mounted_disk, node->bNum, &inode) < 0) {
+        return -1;
+        //to do: error
+    }
+    memcpy(node->name, newName, strlen(newName));
+    memcpy(inode.fileName, newName, strlen(newName));
+
+    if (writeBlock(mounted_disk, node->bNum, &inode) < 0) {
+        return -1;
+        //to do: error
+    }
+    return SUCCESS;
+}
+int tfs_readdir() {
+    SuperBlock sb;
+    Inode inode;
+    readBlock(mounted_disk, 0, &sb);
+    readBlock(mounted_disk, sb.root_inode, &inode);
+    printf("Contents:\n");
+    while (inode.type == INODE) {
+        printf("%s\n", inode.fileName);
+        readBlock(mounted_disk, inode.next_inode, &inode);
+    }
+    return SUCCESS;
 }
