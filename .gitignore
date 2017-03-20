@@ -5,3 +5,6 @@ TinyFSMain
 *.key
 *.dat
 .vscode/
+cats.dat
+secret.key
+new_secret.key

@@ -144,7 +144,8 @@ int openDisk(char *filename, int nBytes, char *password, char *masterKeyFile) {
 
     // creating a disk for the first time
     if (nBytes > 0) {
-        unsigned char *zero_block[BLOCK_SIZE];
+        unsigned char zero_block[BLOCK_SIZE];
+        memset(zero_block, 0, BLOCK_SIZE);
         // write the entire disk with encrypted blank data
         if (nBytes % BLOCK_SIZE != 0) {
             printf("nBytes is not an integral number of blocksize\n");

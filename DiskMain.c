@@ -16,6 +16,9 @@ int main() {
     // open a new disk with the password file
     int diskNum = openDisk(disk, BLOCK_SIZE*5, password, passwordFile);
     unsigned char block[BLOCK_SIZE];
+    memset(block, 3, BLOCK_SIZE);
+    writeBlock(diskNum, 0, block);
+    //writeBlock(diskNum, 1, block);
     readBlock(diskNum, 0, block);
     readBlock(diskNum, 1, block);
     readBlock(diskNum, 2, block);
@@ -25,7 +28,7 @@ int main() {
     closeDisk(diskNum);
     diskNum = openDisk(disk, 0, "WRONG", passwordFile);
 
-    readBlock(diskNum, 4, block);
+    readBlock(diskNum, 0, block);
     print_hex("BLOCK\n", block, BLOCK_SIZE);
     // prints out junk
 
@@ -35,7 +38,8 @@ int main() {
     changePassword(passwordFile, newPasswordFile, password, newPassword);
 
     diskNum = openDisk(disk, 0, newPassword, newPasswordFile);
-    readBlock(diskNum, 4, block);
+    memset(block, 1, BLOCK_SIZE);
+    readBlock(diskNum, 1, block);
 
     print_hex("BLOCK\n", block, BLOCK_SIZE);
     closeDisk(diskNum);
