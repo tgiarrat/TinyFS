@@ -72,6 +72,8 @@ int tfs_mkfs(char *filename, int nBytes, char *password, char *masterKeyFile) {
     block_count = nBytes / BLOCKSIZE; //number of blocks to make
 
     init_superblock( block_count, diskNum); //initializes the superblock
+    
+    closeDisk (diskNum);
     return 0;
 }
 
@@ -123,7 +125,7 @@ int tfs_unmount() {
         return ERROR_UNMOUNTDISK; 
         //to do error
     }
-
+    closeDisk(mounted_disk);
     mounted_disk = -1; //to do: check later
     system_mounted = 0;
 
@@ -137,6 +139,7 @@ int tfs_unmount() {
 		free(temp);
 	}
 	free(curNode);
+    
     return 0;
 }
 

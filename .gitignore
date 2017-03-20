@@ -1,2 +1,7 @@
 DiskMain
+TinyFSMain
 *.o
+*.gch
+*.key
+*.dat
+.vscode/
