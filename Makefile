@@ -15,7 +15,6 @@ DiskMain: libDisk.o libDisk.h
 
 libDisk.o: libDisk.c libDisk.h
 	gcc $(FLAGS) -c libDisk.c libDisk.h
-	gcc -S $<
 
 libDisk.c: libDisk.h
 	touch DiskMain.c
@@ -28,8 +27,7 @@ TinyFSMain: libTinyFS.o libTinyFS.h
 	gcc $(FLAGS) $(CFLAGS) $(LDFLAGS) TinyFSMain.c *.o libDisk.h libTinyFS.h $(LIBFLAGS) -o TinyFSMain
 
 libTinyFS.o: libTinyFS.c libTinyFS.h
-	gcc $(FLAGS) -c libTinyFS.c libTinyFS.h
-	gcc -S $<
+	gcc $(FLAGS) -c libTinyFS.c libTinyFS.h libDisk.h
 
 libTinyFS.c: libTinyFS.h
 	touch TinyFSMain.c
